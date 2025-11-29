@@ -42,6 +42,9 @@ async function getSheetsClient() {
 async function getTestCellA1() {
   const sheets = await getSheetsClient();
 
+  console.log('[GoogleSheets][TEST] SpreadsheetId:', sheetsRsvpSpreadsheetId);
+  console.log('[GoogleSheets][TEST] SheetName:', sheetsRsvpSheetName);
+
   const range = `${sheetsRsvpSheetName}!A1`;
 
   const response = await sheets.spreadsheets.values.get({

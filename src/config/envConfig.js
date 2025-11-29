@@ -17,15 +17,15 @@ requiredEnvVars.forEach((name) => {
   }
 });
 
-// Arreglar saltos de línea de la private key (Railway y .env suelen guardarla con \n)
+// Arreglar saltos de línea y espacios
 const fixedPrivateKey = process.env.GOOGLE_PRIVATE_KEY
   ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
   : undefined;
 
 module.exports = {
-  googleProjectId: process.env.GOOGLE_PROJECT_ID,
-  googleClientEmail: process.env.GOOGLE_CLIENT_EMAIL,
+  googleProjectId: process.env.GOOGLE_PROJECT_ID?.trim(),
+  googleClientEmail: process.env.GOOGLE_CLIENT_EMAIL?.trim(),
   googlePrivateKey: fixedPrivateKey,
-  sheetsRsvpSpreadsheetId: process.env.SHEETS_RSVP_SPREADSHEET_ID,
-  sheetsRsvpSheetName: process.env.SHEETS_RSVP_SHEET_NAME,
+  sheetsRsvpSpreadsheetId: process.env.SHEETS_RSVP_SPREADSHEET_ID?.trim(),
+  sheetsRsvpSheetName: process.env.SHEETS_RSVP_SHEET_NAME?.trim(),
 };
