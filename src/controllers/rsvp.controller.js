@@ -3,12 +3,16 @@ const { getTestCellA1, appendRsvpRow } = require('../services/googleSheets.servi
 
 async function testSheetsConnection(req, res) {
   try {
-    const cellValue = await getTestCellA1();
+    // puedes pasar un eventId por query para probar un evento concreto
+    const { eventId } = req.query; // /api/rsvp/test?eventId=babyshower-sofia
+
+    const cellValue = await getTestCellA1(eventId);
 
     return res.status(200).json({
       ok: true,
       message: 'Conexión a Google Sheets OK',
       sheetCellA1: cellValue,
+      eventId: eventId || 'default',
     });
   } catch (error) {
     console.error('Error al probar conexión con Google Sheets:', error);
@@ -26,14 +30,13 @@ async function createRsvp(req, res) {
 
     const {
       nombreInvitado,
-      confirmaAsistencia, // 'Si' | 'No'
+      confirmaAsistencia,
       cantidadAdultos,
       cantidadNinos,
       telefonoContacto,
       observaciones,
     } = req.body;
 
-    // Validación simple
     if (!nombreInvitado || !confirmaAsistencia) {
       return res.status(400).json({
         ok: false,
@@ -41,7 +44,6 @@ async function createRsvp(req, res) {
       });
     }
 
-    // Valores con defaults básicos
     const adultos = Number.isFinite(Number(cantidadAdultos))
       ? Number(cantidadAdultos)
       : 0;
@@ -52,8 +54,6 @@ async function createRsvp(req, res) {
     const telefono = telefonoContacto || '';
     const obs = observaciones || '';
 
-    // Armamos la fila según tus columnas
-    // Puedes agregar aquí eventId o timestamp si quieres en el futuro
     const rowValues = [
       nombreInvitado,
       confirmaAsistencia,
@@ -63,7 +63,7 @@ async function createRsvp(req, res) {
       obs,
     ];
 
-    await appendRsvpRow(rowValues);
+    await appendRsvpRow(eventId, rowValues);
 
     return res.status(201).json({
       ok: true,

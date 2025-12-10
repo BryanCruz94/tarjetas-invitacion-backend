@@ -3,9 +3,8 @@ const { google } = require('googleapis');
 const {
   googleClientEmail,
   googlePrivateKey,
-  sheetsRsvpSpreadsheetId,
-  sheetsRsvpSheetName,
 } = require('../config/envConfig');
+const { getSheetConfigByEventId } = require('../config/eventsConfig');
 
 let sheetsClient;
 
@@ -39,16 +38,18 @@ async function getSheetsClient() {
 /**
  * Prueba de conexión: lee el valor de la celda A1
  */
-async function getTestCellA1() {
+async function getTestCellA1(eventId) {
   const sheets = await getSheetsClient();
 
-  console.log('[GoogleSheets][TEST] SpreadsheetId:', sheetsRsvpSpreadsheetId);
-  console.log('[GoogleSheets][TEST] SheetName:', sheetsRsvpSheetName);
+  const { spreadsheetId, sheetName } = getSheetConfigByEventId(eventId);
 
-  const range = `${sheetsRsvpSheetName}!A1`;
+  console.log('[GoogleSheets][TEST] SpreadsheetId:', spreadsheetId);
+  console.log('[GoogleSheets][TEST] SheetName:', sheetName);
+
+  const range = `${sheetName}!A1`;
 
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetsRsvpSpreadsheetId,
+    spreadsheetId,
     range,
   });
 
@@ -62,16 +63,18 @@ async function getTestCellA1() {
  * Agrega una fila a la hoja de RSVP.
  * [Nombre, Confirma, Adultos, Niños, Teléfono, Observaciones]
  */
-async function appendRsvpRow(rowValues) {
+async function appendRsvpRow(eventId, rowValues) {
   const sheets = await getSheetsClient();
 
-  const range = `${sheetsRsvpSheetName}!A:F`; // Ajusta si hay más columnas
+  const { spreadsheetId, sheetName } = getSheetConfigByEventId(eventId);
+
+  const range = `${sheetName}!A:F`;
   const resource = {
     values: [rowValues],
   };
 
   const response = await sheets.spreadsheets.values.append({
-    spreadsheetId: sheetsRsvpSpreadsheetId,
+    spreadsheetId,
     range,
     valueInputOption: 'USER_ENTERED',
     resource,
