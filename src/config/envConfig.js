@@ -19,9 +19,25 @@ requiredEnvVars.forEach((name) => {
 });
 
 // Arreglar saltos de línea y espacios
-const fixedPrivateKey = process.env.GOOGLE_PRIVATE_KEY
-  ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
-  : undefined;
+function normalizePrivateKey(value) {
+  if (!value) return undefined;
+
+  const trimmedValue = value.trim();
+  const hasWrappingQuotes =
+    (trimmedValue.startsWith('"') && trimmedValue.endsWith('"')) ||
+    (trimmedValue.startsWith("'") && trimmedValue.endsWith("'"));
+  const unquotedValue = hasWrappingQuotes
+    ? trimmedValue.slice(1, -1)
+    : trimmedValue;
+
+  return unquotedValue
+    .replace(/\\\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\r\n/g, '\n')
+    .trim();
+}
+
+const fixedPrivateKey = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
 
 const corsAllowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || '')
   .split(',')
