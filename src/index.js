@@ -7,11 +7,29 @@ const rsvpRoutes = require('./routes/rsvp.routes');
 // Cargar .env
 dotenv.config();
 
+const { corsAllowedOrigins } = require('./config/envConfig');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin(origin, callback) {
+    // Herramientas como Postman y peticiones entre servidores no envian Origin.
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    const isAllowed = corsAllowedOrigins.includes(normalizedOrigin);
+
+    if (!isAllowed) {
+      console.warn(`[CORS] Origen bloqueado: ${origin}`);
+    }
+
+    return callback(null, isAllowed);
+  },
+}));
 app.use(express.json());
 
 // Rutas

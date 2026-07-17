@@ -9,6 +9,7 @@ const requiredEnvVars = [
   'GOOGLE_PRIVATE_KEY',
   'SHEETS_RSVP_SPREADSHEET_ID',
   'SHEETS_RSVP_SHEET_NAME',
+  'CORS_ALLOWED_ORIGINS',
 ];
 
 requiredEnvVars.forEach((name) => {
@@ -22,10 +23,16 @@ const fixedPrivateKey = process.env.GOOGLE_PRIVATE_KEY
   ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
   : undefined;
 
+const corsAllowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
 module.exports = {
   googleProjectId: process.env.GOOGLE_PROJECT_ID?.trim(),
   googleClientEmail: process.env.GOOGLE_CLIENT_EMAIL?.trim(),
   googlePrivateKey: fixedPrivateKey,
   sheetsRsvpSpreadsheetId: process.env.SHEETS_RSVP_SPREADSHEET_ID?.trim(),
   sheetsRsvpSheetName: process.env.SHEETS_RSVP_SHEET_NAME?.trim(),
+  corsAllowedOrigins,
 };
