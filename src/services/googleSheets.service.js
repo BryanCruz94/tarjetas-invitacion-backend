@@ -68,12 +68,25 @@ async function appendRsvpRow(eventId, rowValues) {
 
   const { spreadsheetId, sheetName } = getSheetConfigByEventId(eventId);
 
-  const range = `${sheetName}!A:F`;
+  const readRange = `${sheetName}!A:F`;
+  const currentRows = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: readRange,
+  });
+
+  const rows = currentRows.data.values || [];
+  const firstEmptyRowIndex = rows.findIndex((row, index) => {
+    if (index === 0) return false;
+    return !row || row.every((cell) => String(cell || '').trim() === '');
+  });
+
+  const targetRow = firstEmptyRowIndex === -1 ? rows.length + 1 : firstEmptyRowIndex + 1;
+  const range = `${sheetName}!A${targetRow}:F${targetRow}`;
   const resource = {
     values: [rowValues],
   };
 
-  const response = await sheets.spreadsheets.values.append({
+  const response = await sheets.spreadsheets.values.update({
     spreadsheetId,
     range,
     valueInputOption: 'USER_ENTERED',

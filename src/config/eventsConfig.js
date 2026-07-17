@@ -7,6 +7,11 @@ const EVENTS_SHEETS_CONFIG = {
     sheetName: 'INVITADOS_SOFIA',
   },
 
+  'babyshower-elian-celi': {
+    spreadsheetId: sheetsRsvpSpreadsheetId,
+    sheetName: 'INVITADOS_ELIAN_CELI',
+  },
+
   // Nuevo evento / nueva tarjeta
   'cena-navidena-centremyp': {
     spreadsheetId: sheetsRsvpSpreadsheetId,
