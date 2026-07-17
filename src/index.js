@@ -11,6 +11,7 @@ const { corsAllowedOrigins } = require('./config/envConfig');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0';
 
 // Middlewares
 app.use(cors({
@@ -32,6 +33,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Railway usa este endpoint para comprobar que el proceso esta disponible.
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Rutas
 app.use('/api/rsvp', rsvpRoutes);
 
@@ -41,6 +47,11 @@ app.get('/', (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en puerto ${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Servidor escuchando en http://${HOST}:${PORT}`);
+});
+
+server.on('error', (error) => {
+  console.error('[SERVER] No se pudo iniciar el servidor:', error);
+  process.exit(1);
 });
